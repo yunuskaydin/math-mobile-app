@@ -10,7 +10,12 @@ class VideoSerializer(serializers.ModelSerializer):
 
 class FolderSerializer(serializers.ModelSerializer):
     videos = VideoSerializer(many=True, read_only=True)
+    subfolders = serializers.SerializerMethodField()
 
     class Meta:
         model = Folder
         fields = '__all__'
+
+    def get_subfolders(self, obj):
+        subfolders = obj.subfolders.all()
+        return FolderSerializer(subfolders, many=True).data
