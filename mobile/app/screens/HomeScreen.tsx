@@ -13,21 +13,21 @@ import {
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { Folder } from "../../types/Folder";
+import { Ionicons } from "@expo/vector-icons"; // For login/logout icon
 
 export default function HomeScreen() {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [folderName, setFolderName] = useState("");
+  const [showLogin, setShowLogin] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const fetchToken = async () => {
       const storedToken = await SecureStore.getItemAsync("userToken");
-      if (storedToken) {
-        setToken(storedToken);
-      }
+      setToken(storedToken || null);
     };
 
     fetchToken();
@@ -54,6 +54,7 @@ export default function HomeScreen() {
       const userToken = response.data.token;
       await SecureStore.setItemAsync("userToken", userToken);
       setToken(userToken);
+      setShowLogin(false); // Hide login form after successful login
       Alert.alert("Login successful!");
     } catch (error) {
       Alert.alert("Login failed", "Invalid credentials");
@@ -96,28 +97,6 @@ export default function HomeScreen() {
     }
   };
 
-  if (!token) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <Button title="Login" onPress={handleLogin} />
-      </View>
-    );
-  }
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -128,29 +107,69 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Folders</Text>
+      {/* Header with login/logout icon */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Folders</Text>
+        <TouchableOpacity
+          onPress={() => (token ? handleLogout() : setShowLogin(true))}
+        >
+          <Ionicons
+            name={token ? "log-out-outline" : "log-in-outline"}
+            size={28}
+            color="black"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Login Form (Only visible when showLogin is true) */}
+      {showLogin && !token && (
+        <View style={styles.loginContainer}>
+          <Text style={styles.title}>Login</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <Button title="Login" onPress={handleLogin} />
+        </View>
+      )}
+
+      {/* Folder List (Visible for all users) */}
       <FlatList
         data={folders}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.folderText}>{item.name}</Text>
-            <TouchableOpacity onPress={() => handleDeleteFolder(item.id)}>
-              <Text style={styles.deleteText}>❌</Text>
-            </TouchableOpacity>
+            {token && (
+              <TouchableOpacity onPress={() => handleDeleteFolder(item.id)}>
+                <Text style={styles.deleteText}>❌</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="New folder name"
-        value={folderName}
-        onChangeText={setFolderName}
-      />
-      <Button title="Create Folder" onPress={handleCreateFolder} />
-
-      <Button title="Logout" onPress={handleLogout} color="red" />
+      {/* Folder Creation (Only for authenticated users) */}
+      {token && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="New folder name"
+            value={folderName}
+            onChangeText={setFolderName}
+          />
+          <Button title="Create Folder" onPress={handleCreateFolder} />
+        </>
+      )}
     </View>
   );
 }
@@ -158,26 +177,39 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
+    backgroundColor: "#fff",
+    width: "100%",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+  },
+  loginContainer: {
+    width: "100%",
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 15,
   },
   input: {
     width: "100%",
     padding: 10,
     borderWidth: 1,
+    borderColor: "#ccc",
     marginBottom: 10,
     borderRadius: 5,
   },
   item: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "100%",
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
