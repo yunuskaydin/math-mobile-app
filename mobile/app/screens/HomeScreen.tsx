@@ -111,7 +111,13 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Folders</Text>
         <TouchableOpacity
-          onPress={() => (token ? handleLogout() : setShowLogin(true))}
+          onPress={() => {
+            if (token) {
+              handleLogout();
+            } else {
+              setShowLogin(!showLogin);
+            }
+          }}
         >
           <Ionicons
             name={token ? "log-out-outline" : "log-in-outline"}
@@ -138,7 +144,12 @@ export default function HomeScreen() {
             value={password}
             onChangeText={setPassword}
           />
-          <Button title="Login" onPress={handleLogin} />
+          <TouchableOpacity
+            style={styles.createFolderButton}
+            onPress={handleLogin}
+          >
+            <Text style={styles.createFolderButtonText}>Login</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -167,7 +178,12 @@ export default function HomeScreen() {
             value={folderName}
             onChangeText={setFolderName}
           />
-          <Button title="Create Folder" onPress={handleCreateFolder} />
+          <TouchableOpacity
+            style={styles.createFolderButton}
+            onPress={handleCreateFolder}
+          >
+            <Text style={styles.createFolderButtonText}>Create Folder</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>
@@ -175,50 +191,91 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  createFolderButton: {
+    backgroundColor: "#FF7F50", // Sunset Orange
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    shadowColor: "#FF4500", // Warm Glow
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  createFolderButtonText: {
+    color: "#FFF5E1", // Soft Sunset Yellow
+    fontSize: 18,
+    fontWeight: "bold",
+    letterSpacing: 1,
+  },
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF3E0", // Soft peach background
     width: "100%",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 15,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#FFAB91",
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
+    color: "#D84315", // Deep sunset orange
   },
   loginContainer: {
     width: "100%",
     padding: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 15,
+    backgroundColor: "#FFCCBC",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    marginBottom: 20,
   },
   input: {
     width: "100%",
-    padding: 10,
+    padding: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 10,
-    borderRadius: 5,
+    borderColor: "#FF8A65",
+    borderRadius: 8,
+    backgroundColor: "#FFFFFF",
+    color: "#D84315",
+    marginBottom: 12,
   },
   item: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 10,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#FF8A65",
+    backgroundColor: "#FFE0B2",
+    borderRadius: 8,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   folderText: {
     fontSize: 18,
+    fontWeight: "500",
+    color: "#BF360C",
   },
   deleteText: {
-    color: "red",
+    color: "#B71C1C",
     fontSize: 18,
+    fontWeight: "600",
   },
 });
