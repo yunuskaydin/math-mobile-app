@@ -4,7 +4,7 @@ from rest_framework import viewsets, generics, status
 from .models import Folder, Video
 from .serializers import FolderSerializer, VideoSerializer, RegisterSerializer, LoginSerializer
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
 from .permissions import IsAdminUser
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
@@ -15,9 +15,9 @@ class FolderViewSet(viewsets.ModelViewSet):
     serializer_class = FolderSerializer
 
     def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]  # Public access for GET requests
-        return [IsAuthenticatedOrReadOnly()]  # Auth required for others
+        if self.request.method in ['GET']:
+            return [AllowAny()]  # Anyone can view folders
+        return [IsAuthenticated()]  # Only authenticated users (teacher) can modify
 
 
 class VideoViewSet(viewsets.ModelViewSet):
@@ -25,9 +25,9 @@ class VideoViewSet(viewsets.ModelViewSet):
     serializer_class = VideoSerializer
 
     def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]
-        return [IsAuthenticatedOrReadOnly()]
+        if self.request.method in ['GET']:
+            return [AllowAny()]  # Anyone can view videos
+        return [IsAuthenticated()]  # Only authenticated users (teacher) can modify
 
 
 
@@ -40,4 +40,7 @@ class LoginView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key})
+        return Response({
+            "token": token.key,
+            "is_staff": user.is_staff  # Add this to identify teacher
+        })
