@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons"; // For login/logout icon
 
 export default function HomeScreen() {
   const [folders, setFolders] = useState<Folder[]>([]);
+  const [currentFolder, setCurrentFolder] = useState<Folder | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [folderName, setFolderName] = useState("");
@@ -72,7 +73,10 @@ export default function HomeScreen() {
     try {
       await axios.post(
         "http://10.0.2.2:8000/api/folders/",
-        { name: folderName },
+        { 
+          name: folderName,
+          parent: currentFolder?.id || null 
+        },
         { headers: { Authorization: `Token ${token}` } }
       );
       setFolderName("");
@@ -97,6 +101,10 @@ export default function HomeScreen() {
     }
   };
 
+  const handleFolderPress = (folder: Folder) => {
+    setCurrentFolder(folder);
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -109,7 +117,15 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Header with login/logout icon */}
       <View style={styles.header}>
-        <Text style={styles.title}>Folders</Text>
+        <TouchableOpacity 
+          onPress={() => setCurrentFolder(null)} 
+          style={styles.backButton}
+        >
+          {currentFolder && <Ionicons name="arrow-back" size={24} color="black" />}
+        </TouchableOpacity>
+        <Text style={styles.title}>
+          {currentFolder ? currentFolder.name : "Folders"}
+        </Text>
         <TouchableOpacity
           onPress={() => {
             if (token) {
@@ -155,17 +171,24 @@ export default function HomeScreen() {
 
       {/* Folder List (Visible for all users) */}
       <FlatList
-        data={folders}
+        data={folders.filter(folder => 
+          currentFolder 
+            ? folder.parent === currentFolder?.id 
+            : !folder.parent
+        )}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.item}>
+          <TouchableOpacity 
+            style={styles.item}
+            onPress={() => handleFolderPress(item)}
+          >
             <Text style={styles.folderText}>{item.name}</Text>
             {token && (
               <TouchableOpacity onPress={() => handleDeleteFolder(item.id)}>
                 <Text style={styles.deleteText}>❌</Text>
               </TouchableOpacity>
             )}
-          </View>
+          </TouchableOpacity>
         )}
       />
 
@@ -225,6 +248,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#FFAB91",
+  },
+  backButton: {
+    padding: 5,
   },
   title: {
     fontSize: 26,
