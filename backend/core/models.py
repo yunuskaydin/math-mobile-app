@@ -14,7 +14,8 @@ class Folder(models.Model):
 
 class Video(models.Model):
     title = models.CharField(max_length=255)
-    video_file = models.FileField(upload_to='videos/')
+    video_file = models.FileField(upload_to='videos/', null=True, blank=True)
+    youtube_url = models.URLField(null=True, blank=True)
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='videos')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
