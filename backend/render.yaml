@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: math-backend
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn config.wsgi
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
