@@ -3,7 +3,7 @@ services:
     name: math-backend
     env: python
     buildCommand: ""
-    startCommand: gunicorn config.wsgi
+    startCommand: gunicorn backend.config.wsgi
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: config.settings
+        value: backend.config.settings
