@@ -7,3 +7,13 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: backend.config.settings
+      - key: DATABASE_URL
+        fromDatabase:
+          name: math-mobile-db
+          property: connectionString
+
+databases:
+  - name: math-mobile-db
+    databaseName: math_mobile
+    user: math_mobile_user
+    plan: free
