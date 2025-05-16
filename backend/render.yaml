@@ -7,13 +7,21 @@ services:
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: backend.config.settings
-      - key: DATABASE_URL
-        fromDatabase:
-          name: math-mobile-db
-          property: connectionString
+      - key: RENDER
+        value: true
+      - key: POSTGRES_DATABASE
+        value: math_db
+      - key: POSTGRES_USER
+        value: math_db_user
+      - key: POSTGRES_PASSWORD
+        value: lL0LX7xBX7oxbUNIMdAhKs5tN2HwMCoh
+      - key: POSTGRES_HOST
+        value: dpg-d0jq1it6ubrc73an8ag0-a.oregon-postgres.render.com
+      - key: POSTGRES_PORT
+        value: 5432
 
 databases:
   - name: math-mobile-db
-    databaseName: math_mobile
-    user: math_mobile_user
+    databaseName: math_db
+    user: math_db_user
     plan: free
