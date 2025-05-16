@@ -13,9 +13,13 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os  # Add this at the top with other imports
 import dj_database_url
+import sys  # Add this import
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Add the backend directory to the Python path
+sys.path.append(str(BASE_DIR))
 
 
 # Quick-start development settings - unsuitable for production
