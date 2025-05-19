@@ -148,7 +148,7 @@ export default function HomeScreen() {
     if (!token) return Alert.alert("You must be logged in to delete videos.");
 
     try {
-      await axios.delete(`${API_ENDPOINTS.VIDEOS}/${id}/`, {
+      await axios.delete(`${API_ENDPOINTS.VIDEOS}${id}/`, {
         headers: { Authorization: `Token ${token}` },
       });
       fetchVideos();
