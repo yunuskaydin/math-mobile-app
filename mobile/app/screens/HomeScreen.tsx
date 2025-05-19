@@ -20,6 +20,7 @@ import { Folder } from "../../types/Folder";
 import { Ionicons } from "@expo/vector-icons"; // For login/logout icon
 import { WebView } from 'react-native-webview';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import { API_ENDPOINTS } from "../config/api";
 
 interface Video {
   id: number;
@@ -59,7 +60,7 @@ export default function HomeScreen() {
 
   const fetchFolders = async () => {
     try {
-      const response = await axios.get("http://10.0.2.2:8000/api/folders");
+      const response = await axios.get(API_ENDPOINTS.FOLDERS);
       setFolders(response.data);
     } catch (error) {
       console.error(error);
@@ -71,7 +72,7 @@ export default function HomeScreen() {
   const fetchVideos = async () => {
     try {
       console.log('Fetching videos...');
-      const response = await axios.get("http://10.0.2.2:8000/api/videos/");
+      const response = await axios.get(API_ENDPOINTS.VIDEOS);
       console.log('Videos fetched:', response.data);
       setVideos(response.data);
     } catch (error) {
@@ -81,14 +82,14 @@ export default function HomeScreen() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://10.0.2.2:8000/api/login/", {
+      const response = await axios.post(API_ENDPOINTS.LOGIN, {
         username,
         password,
       });
       const userToken = response.data.token;
       await SecureStore.setItemAsync("userToken", userToken);
       setToken(userToken);
-      setShowLogin(false); // Hide login form after successful login
+      setShowLogin(false);
       Alert.alert("Login successful!");
     } catch (error) {
       Alert.alert("Login failed", "Invalid credentials");
@@ -113,7 +114,7 @@ export default function HomeScreen() {
 
     try {
       await axios.post(
-        "http://10.0.2.2:8000/api/folders/",
+        API_ENDPOINTS.FOLDERS,
         { 
           name: folderName,
           parent: currentFolder?.id || null 
@@ -133,7 +134,7 @@ export default function HomeScreen() {
     if (!token) return Alert.alert("You must be logged in to delete folders.");
 
     try {
-      await axios.delete(`http://10.0.2.2:8000/api/folders/${id}/`, {
+      await axios.delete(`${API_ENDPOINTS.FOLDERS}/${id}/`, {
         headers: { Authorization: `Token ${token}` },
       });
       fetchFolders();
@@ -147,7 +148,7 @@ export default function HomeScreen() {
     if (!token) return Alert.alert("You must be logged in to delete videos.");
 
     try {
-      await axios.delete(`http://10.0.2.2:8000/api/videos/${id}/`, {
+      await axios.delete(`${API_ENDPOINTS.VIDEOS}/${id}/`, {
         headers: { Authorization: `Token ${token}` },
       });
       fetchVideos();
@@ -270,24 +271,25 @@ export default function HomeScreen() {
 
   const handleCreateVideo = async () => {
     if (!token) {
-      Alert.alert("Error", "You must be logged in to create videos");
+      Alert.alert("Error", "You must be logged in to add videos");
       return;
     }
 
     if (!videoUrl || !videoName) {
-      Alert.alert("Error", "Please enter both video URL and name");
+      Alert.alert("Error", "Please enter both video name and URL");
       return;
     }
 
-    const cleanedUrl = getYouTubeEmbedHtml(videoUrl);
-    if (!cleanedUrl) {
-      Alert.alert("Error", "Invalid YouTube URL. Please enter a valid YouTube video URL");
+    const cleanedUrl = videoUrl.trim();
+    const videoId = extractVideoId(cleanedUrl);
+    if (!videoId) {
+      Alert.alert("Error", "Invalid YouTube URL");
       return;
     }
 
     try {
       const response = await axios.post(
-        "http://10.0.2.2:8000/api/videos/",
+        API_ENDPOINTS.VIDEOS,
         {
           title: videoName,
           youtube_url: cleanedUrl,
@@ -307,7 +309,6 @@ export default function HomeScreen() {
     } catch (error: any) {
       console.error('Error creating video:', error.response?.data || error.message);
       if (error.response?.data) {
-        // Show the specific error message from the backend
         const errorMessage = typeof error.response.data === 'object' 
           ? Object.values(error.response.data).join('\n')
           : error.response.data;
