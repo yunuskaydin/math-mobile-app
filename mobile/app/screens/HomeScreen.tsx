@@ -134,7 +134,7 @@ export default function HomeScreen() {
     if (!token) return Alert.alert("You must be logged in to delete folders.");
 
     try {
-      await axios.delete(`${API_ENDPOINTS.FOLDERS}/${id}/`, {
+      await axios.delete(`${API_ENDPOINTS.FOLDERS}${id}/`, {
         headers: { Authorization: `Token ${token}` },
       });
       fetchFolders();
