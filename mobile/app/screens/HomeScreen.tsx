@@ -355,7 +355,7 @@ export default function HomeScreen() {
           {currentFolder && <Ionicons name="arrow-back" size={24} color="black" />}
         </TouchableOpacity>
         <Text style={styles.title}>
-          {currentFolder ? currentFolder.name : "Folders"}
+          {currentFolder ? currentFolder.name : "Klasörler"}
         </Text>
         <TouchableOpacity
           onPress={() => {
@@ -377,7 +377,7 @@ export default function HomeScreen() {
       {/* Login Form */}
       {showLogin && !token && (
         <View style={styles.loginContainer}>
-          <Text style={styles.title}>Login</Text>
+          <Text style={styles.title}>Admin Girişi</Text>
           <TextInput
             style={styles.input}
             placeholder="Username"
@@ -395,7 +395,7 @@ export default function HomeScreen() {
             style={styles.createFolderButton}
             onPress={handleLogin}
           >
-            <Text style={styles.createFolderButtonText}>Login</Text>
+            <Text style={styles.createFolderButtonText}>Admin Girişi</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -465,13 +465,13 @@ export default function HomeScreen() {
             style={styles.createButton}
             onPress={() => setShowVideoModal(true)}
           >
-            <Text style={styles.createButtonText}>Create Video</Text>
+            <Text style={styles.createButtonText}>Video Oluştur</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.createButton}
             onPress={() => setShowFolderModal(true)}
           >
-            <Text style={styles.createButtonText}>Create Folder</Text>
+            <Text style={styles.createButtonText}>Dosya Oluştur</Text>
           </TouchableOpacity>
         </View>
       )}
